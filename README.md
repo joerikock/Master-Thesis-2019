@@ -1,6 +1,6 @@
 # Traffic generator
 
-Generate 'normal' internet traffic based on a DDoS fingerprint from DDoSDB and a file bigFlows.pcap
+Generate 'normal' internet traffic based on a DDoS fingerprint from DDoSDB and a file bigFlows.pcap. A percentage of 'overlap' is specified, and the code updates the source IPs of bigFlows to overlap partly with the IP addresses from the fingerprint.
 
 ## Prerequisites
 
