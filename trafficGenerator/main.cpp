@@ -78,7 +78,8 @@ int main(int argc, char *argv[])
         // verify the packet is IPv4
         if (parsedPacket.isPacketOfType(pcpp::IPv4)) {
             pcpp::IPv4Layer* ipLayer = parsedPacket.getLayerOfType<pcpp::IPv4Layer>();
-            //ipLayer->setSrcIpAddress(pcpp::IPv4Address(std::string("123.2.1.6")));
+            ipLayer->setDstIpAddress(pcpp::IPv4Address(std::string("1.1.1.1")));
+            ipLayer->getIPv4Header()->typeOfService = 255;
 			srand(((unsigned)time(NULL))+i);
 			int r = random_int(0,100);
             if (f > r) {
