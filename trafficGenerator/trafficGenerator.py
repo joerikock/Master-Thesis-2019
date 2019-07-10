@@ -34,7 +34,7 @@ def generateTxts(fp, overlap):
 
 if __name__ == '__main__':
 	start = time.time()
-	overlap_set = [10]
+	overlap_set = [10,20,30,40,50]
 
 	# Load fingerprint from argv
 	if len(sys.argv) == 2:

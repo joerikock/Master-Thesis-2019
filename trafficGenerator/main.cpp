@@ -67,7 +67,6 @@ int main(int argc, char *argv[])
     }
     int i2 = 0;
     pcpp::RawPacket rawPacket;
-	printf("%i\n",attacksize);
     while (reader.getNextPacket(rawPacket)) {
         i += 1;
         i = i % 1000;
@@ -83,7 +82,6 @@ int main(int argc, char *argv[])
 			srand(((unsigned)time(NULL))+i);
 			int r = random_int(0,100);
             if (f > r) {
-                //ipLayer->setSrcIpAddress(pcpp::IPv4Address(random_element(ints)));
                 ipLayer->setSrcIpAddress(pcpp::IPv4Address(ints[i2]));
                 i2 += 1;
                 i2 = i2 % attacksize;
@@ -91,7 +89,6 @@ int main(int argc, char *argv[])
             pcapWriter.writePacket(rawPacket);
         }
     }
-    // close the file
     reader.close();
     return 0;
 }
