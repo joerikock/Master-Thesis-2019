@@ -45,10 +45,6 @@ if __name__ == '__main__':
 	
 	# This line extracts the ID from the fingerprint file (might use later)
 	filename = os.path.splitext(os.path.basename(sys.argv[1]))[0] 
-	
-	# Delete all files in /traffic for a fresh start
-	#shutil.rmtree('./traffic')
-	#os.makedirs('traffic')
 
 	for overlap in overlap_set:
 		generateTxts(fingerprint, overlap)

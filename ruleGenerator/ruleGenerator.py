@@ -9,6 +9,7 @@ from ipaddress import ip_network, ip_address
 from socket import inet_aton
 import itertools
 
+
 def convertIpAddressesIntoCdirMaxRules(ipAddresses, maxRuleAmount):
 	currentPrefixSize = 32
 	
@@ -85,6 +86,7 @@ def convertIpAddressesIntoCdirMaxRules(ipAddresses, maxRuleAmount):
 	return resultList
 
 
+# Generate Type 2 rule component
 def getSourceIps(fingerprintSourceIps):
 	ip_set = []
 	for ip in fingerprintSourceIps:
@@ -93,7 +95,6 @@ def getSourceIps(fingerprintSourceIps):
 
 
 # Generate Type 3 rule component
-# TODO: Support more protocols?
 def getIpProtocols(fingerprintProtocol):
 	ipProtocols = []
 
@@ -106,6 +107,7 @@ def getIpProtocols(fingerprintProtocol):
 
 	return ipProtocols
 
+
 # Generate Type 5 or Type 6 rule component
 def getPorts(fingerprintPorts):
 	ports = []
@@ -116,9 +118,11 @@ def getPorts(fingerprintPorts):
 
 	return ports
 
+
 # Generate Type 7 rule component
 def getIcmpType(fingerprintIcmpType):
 	return int(float(fingerprintIcmpType))
+
 
 # Generate Type 9 rule component
 def getTcpFlag(fingerprintTcpFlag):
@@ -147,6 +151,7 @@ def getTcpFlag(fingerprintTcpFlag):
 			raise ValueError('Encountered flag with unknown format')
 
 	return tcpFlags
+
 
 # Parser (IL to Junos OS)
 def parseRuleToJunos(rule):
@@ -187,6 +192,7 @@ flow {{
 	}}
 }}"""
 
+
 # Rule generator
 def main():
 	fingerprint = None
@@ -210,9 +216,7 @@ def main():
 	baseFlowspecRule['type1'] = '{}/32'.format(destinationIp)
 
 	# Type 2 will be dynamically generated and added to the resulting ruleset later
-	# TODO: Create (weighted) algorithm for reducing fingerprint source IPs into prefixes
 	source_ips = getSourceIps(fingerprint['src_ips'])
-	# baseFlowspecRule['type2'] = None
 
 	# Collect Type 3 (IP protocol)
 	type3 = getIpProtocols(fingerprint['protocol'])
@@ -255,6 +259,7 @@ def main():
 
 	return flowspecRules
 
+
 if __name__ == '__main__':
 	ruleset = main()
 
@@ -263,5 +268,3 @@ if __name__ == '__main__':
 		result.append(parseRuleToJunos(rule))
 	for rule in result:
 	    print(rule)
-
-	# print(result)
