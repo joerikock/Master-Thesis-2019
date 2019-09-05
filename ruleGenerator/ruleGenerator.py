@@ -310,4 +310,5 @@ if __name__ == '__main__':
 	result = []
 	for rule in ruleset:
 		result.append(parseRuleToJunos(rule))
-	print(result)
+	for rule in result:
+		print(rule)
