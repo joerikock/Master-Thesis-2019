@@ -90,6 +90,7 @@ def convertIpAddressesIntoCdirMaxRules(ipAddresses, maxRuleAmount):
 def getSourceIps(fingerprintSourceIps):
 	ip_set = []
 	for ip in fingerprintSourceIps:
+		print(ip)
 		ip_set.append(ip['ip'])
 	return ip_set
 
@@ -154,9 +155,9 @@ def getTcpFlag(fingerprintTcpFlag):
 
 
 # Parser (IL to Junos OS)
-def parseRuleToJunos(rule):
+def parseRuleToJunos2(rule):
 	def wrapMatchStatement(statement):
-		return "            " + statement + ";\n"
+		return "                    " + statement + ";\n"
 	
 	matchBlock = ""
 	# Destination
@@ -187,10 +188,35 @@ flow {{
 	term-order standard;
 	route {random.randint(0,1000000)} {{
 		match {{
-{matchBlock}        }}
+{matchBlock}
+		}}
 		then discard;
 	}}
 }}"""
+
+def parseRuleToJunos(rule):
+	resultRule = []
+	if 'type1' in rule.keys():
+		resultRule.append('destination ' + rule['type1'])
+	if 'type2' in rule.keys():
+		resultRule.append('source ' + rule['type2'])
+	if 'type3' in rule.keys():
+		protocolMap = {
+			1: "icmp",
+			6: "tcp",
+			17: "udp"
+		}
+		for protocol in rule['type3']:
+			resultRule.append('protocol ' + protocolMap[protocol])
+	if 'type5' in rule.keys():
+		resultRule.append('destination-port ' + str(rule['type5'][0]))
+	if 'type6' in rule.keys():
+		resultRule.append('source-port ' + str(rule['type6'][0]))
+	if 'type7' in rule.keys():
+		resultRule.append('icmp-type ' + str(rule['type5'][0]))
+	if 'type9' in rule.keys():
+		resultRule.append('tcp-flags ' + ",".join(rule['type9']))
+	return resultRule
 
 
 # Rule generator
@@ -266,5 +292,7 @@ if __name__ == '__main__':
 	result = []
 	for rule in ruleset:
 		result.append(parseRuleToJunos(rule))
+	
+	# For printing in the JunOS format
 	for rule in result:
 	    print(rule)
