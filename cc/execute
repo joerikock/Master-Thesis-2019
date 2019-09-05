@@ -1,2 +1,2 @@
 #!/bin/bash
-./router_login
+./inject_rules
