@@ -1,0 +1,12 @@
+#!/usr/bin/expect
+
+spawn ssh joeri-msc-student@145.145.18.94
+expect "Enter passphrase*"
+send "joeri\r"
+expect ">"
+send "configure\r"
+send "delete routing-options flow route mscjoeri\r"
+send "commit\r"
+send "exit\r"
+send "exit\r"
+interact

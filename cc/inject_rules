@@ -1,0 +1,18 @@
+#!/usr/bin/expect
+
+set dst_ip "1.1.1.1"
+set route_name "mscjoeri"
+
+spawn ssh joeri-msc-student@145.145.18.94
+expect "Enter passphrase*"
+send "joeri\r"
+expect ">"
+send "configure\r"
+send "edit routing-options flow route $route_name\r"
+send "set match destination $dst_ip\r"
+send "set match protocol icmp\r"
+send "set then discard\r"
+send "commit\r"
+send "exit\r"
+send "exit\r"
+interact
