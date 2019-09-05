@@ -156,44 +156,44 @@ def getTcpFlag(fingerprintTcpFlag):
 	return tcpFlags
 
 
-def parseRuleToJunos2(rule):
-	def wrapMatchStatement(statement):
-		return "            " + statement + ";\n"
+# def parseRuleToJunos2(rule):
+# 	def wrapMatchStatement(statement):
+# 		return "            " + statement + ";\n"
 	
-	matchBlock = ""
-	# Destination
-	if 'type1' in rule.keys():
-		matchBlock += wrapMatchStatement("destination " + rule['type1'])
-	if 'type2' in rule.keys():
-		matchBlock += wrapMatchStatement("source " + rule['type2'])
-	if 'type3' in rule.keys():
-		protocolMap = {
-			1: "icmp",
-			6: "tcp",
-			17: "udp"
-		}
-		for protocol in rule['type3']:
-			matchBlock += wrapMatchStatement("protocol " + protocolMap[protocol])
-	if 'type5' in rule.keys():
-		matchBlock += wrapMatchStatement("destination-port " + str(rule['type5'][0]))
-	if 'type6' in rule.keys():
-		matchBlock += wrapMatchStatement("source-port " + str(rule['type6'][0]))
-	if 'type7' in rule.keys():
-		matchBlock += wrapMatchStatement("icmp-type " + str(rule['type7']))
-	if 'type9' in rule.keys():
-		for flag in rule['type9']:
-			matchBlock += wrapMatchStatement("tcp-flag " + flag)
+# 	matchBlock = ""
+# 	# Destination
+# 	if 'type1' in rule.keys():
+# 		matchBlock += wrapMatchStatement("destination " + rule['type1'])
+# 	if 'type2' in rule.keys():
+# 		matchBlock += wrapMatchStatement("source " + rule['type2'])
+# 	if 'type3' in rule.keys():
+# 		protocolMap = {
+# 			1: "icmp",
+# 			6: "tcp",
+# 			17: "udp"
+# 		}
+# 		for protocol in rule['type3']:
+# 			matchBlock += wrapMatchStatement("protocol " + protocolMap[protocol])
+# 	if 'type5' in rule.keys():
+# 		matchBlock += wrapMatchStatement("destination-port " + str(rule['type5'][0]))
+# 	if 'type6' in rule.keys():
+# 		matchBlock += wrapMatchStatement("source-port " + str(rule['type6'][0]))
+# 	if 'type7' in rule.keys():
+# 		matchBlock += wrapMatchStatement("icmp-type " + str(rule['type7']))
+# 	if 'type9' in rule.keys():
+# 		for flag in rule['type9']:
+# 			matchBlock += wrapMatchStatement("tcp-flag " + flag)
 
-	return f"""
-	flow {{
-		term-order standard;
-		route {random.randint(0,1000000)} {{
-			match {{
-	{matchBlock}
-			}}
-			then discard;
-		}}
-	}}"""
+# 	return f"""
+# 	flow {{
+# 		term-order standard;
+# 		route {random.randint(0,1000000)} {{
+# 			match {{
+# 	{matchBlock}
+# 			}}
+# 			then discard;
+# 		}}
+# 	}}"""
 
 def parseRuleToJunos(rule):
 	resultRule = []
@@ -310,5 +310,10 @@ if __name__ == '__main__':
 	result = []
 	for rule in ruleset:
 		result.append(parseRuleToJunos(rule))
-	for rule in result:
-		print(rule)
+
+	with open("ruleset.txt", "w") as output_file:
+		for rule in result:
+			print(rule, file=output_file)
+	
+	# for rule in result:
+	# 	print(rule)
