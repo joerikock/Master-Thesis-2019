@@ -16,6 +16,8 @@ if __name__ == '__main__':
 
 	subprocess.call(["make","-f","makefile","all"])
 	subprocess.call(["./read", sys.argv[1]])
-
+	# Clean up
+	subprocess.call(["make","-f","makefile","clean"])
+	
 	end = time.time()
 	print('This took me', end-start, 'seconds.')

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <string>
+#include <fstream>
 
 using namespace std;
 
@@ -40,5 +41,10 @@ int main(int argc, char *argv[])
 	reader.close();
 	cout << "True negatives: " << tn << "\n";
 	cout << "False negatives: " << fn << "\n";
+
+	std::ofstream outputfile;
+    outputfile.open ("results.csv", std::ios_base::app);
+    outputfile << "IddD,10,,20,,30,,40,,50\n";
+    outputfile.close();
 	return 0;
 }

@@ -90,7 +90,10 @@ def convertIpAddressesIntoCdirMaxRules(ipAddresses, maxRuleAmount):
 def getSourceIps(fingerprintSourceIps):
 	ip_set = []
 	for ip in fingerprintSourceIps:
-		ip_set.append(ip['ip'])
+		if isinstance(ip, dict):
+			ip_set.append(ip['ip'])
+		else:
+			ip_set.append(ip)
 	return ip_set
 
 
@@ -98,7 +101,7 @@ def getSourceIps(fingerprintSourceIps):
 def getIpProtocols(fingerprintProtocol):
 	ipProtocols = []
 
-	if fingerprintProtocol in ['TCP', 'DNS', 'Chargen']:
+	if fingerprintProtocol in ['TCP']: # Maybe DNS and Chargen here too!
 		ipProtocols.append(6)
 	if fingerprintProtocol in ['UDP', 'DNS', 'Chargen', 'QUIC', 'NTP', 'SSDP']:
 		ipProtocols.append(17)
@@ -153,8 +156,7 @@ def getTcpFlag(fingerprintTcpFlag):
 	return tcpFlags
 
 
-# Parser (IL to Junos OS)
-def parseRuleToJunos(rule):
+def parseRuleToJunos2(rule):
 	def wrapMatchStatement(statement):
 		return "            " + statement + ";\n"
 	
@@ -183,14 +185,56 @@ def parseRuleToJunos(rule):
 			matchBlock += wrapMatchStatement("tcp-flag " + flag)
 
 	return f"""
-flow {{
-	term-order standard;
-	route {random.randint(0,1000000)} {{
-		match {{
-{matchBlock}        }}
-		then discard;
-	}}
-}}"""
+	flow {{
+		term-order standard;
+		route {random.randint(0,1000000)} {{
+			match {{
+	{matchBlock}
+			}}
+			then discard;
+		}}
+	}}"""
+
+def parseRuleToJunos(rule):
+	resultRule = []
+	if 'type1' in rule.keys():
+		resultRule.append('destination ' + rule['type1'])
+	if 'type2' in rule.keys():
+		resultRule.append('source ' + rule['type2'])
+	if 'type3' in rule.keys():
+		protocolMap = {
+			1: "icmp",
+			6: "tcp",
+			17: "udp"
+		}
+		resultRule.append('protocol ' + protocolMap[rule['type3'][0]])
+	if 'type5' in rule.keys():
+		resultRule.append('destination-port ' + str(rule['type5'][0]))
+	if 'type6' in rule.keys():
+		resultRule.append('source-port ' + str(rule['type6'][0]))
+	if 'type7' in rule.keys():
+		icmpMap = {
+			0: "echo-reply",
+			3: "unreachable",
+			4: "source-quench",
+			5: "redirect",
+			8: "echo-request",
+			9: "router-advertisement",
+			10: "router-solicit",
+			11: "time-exceeded",
+			12: "parameter-problem",
+			13: "timestamp",
+			14: "timestamp-reply",
+			15: "info-request",
+			16: "info-reply",
+			17: "mask-request",
+			18: "mask-reply"
+		}
+		resultRule.append('icmp-type ' + icmpMap[rule['type7']])
+	if 'type9' in rule.keys():
+		resultRule.append('tcp-flags ' + ",".join(rule['type9']))
+	resultRule = "{{" + '} {'.join(resultRule) + "}}"
+	return resultRule
 
 
 # Rule generator
@@ -265,6 +309,5 @@ if __name__ == '__main__':
 
 	result = []
 	for rule in ruleset:
-		result.append(rule)
-	for rule in result:
-	    print(rule)
+		result.append(parseRuleToJunos(rule))
+	print(result)

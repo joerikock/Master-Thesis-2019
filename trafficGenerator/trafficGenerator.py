@@ -44,7 +44,7 @@ if __name__ == '__main__':
 		raise ValueError('No fingerprint file supplied.')
 	
 	# This line extracts the ID from the fingerprint file (might use later)
-	filename = os.path.splitext(os.path.basename(sys.argv[1]))[0] 
+	filename = os.path.splitext(os.path.basename(sys.argv[1]))[0]
 
 	for overlap in overlap_set:
 		generateTxts(fingerprint, overlap)
