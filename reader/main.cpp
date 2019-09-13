@@ -8,19 +8,47 @@
 #include <stdlib.h>
 #include <string>
 #include <fstream>
+#include <sstream>
+#include <algorithm>
 
 using namespace std;
+
+// std::vector<std::string> split(const string& input, const string& regex)
+// {
+//     // passing -1 as the submatch index parameter performs splitting
+//     std::regex re(regex);
+//     std::sregex_token_iterator
+//         first{input.begin(), input.end(), re, -1},
+//         last;
+//     return {first, last};
+// }
+
+std::vector<std::string> split(const std::string &s, char delim) {
+  std::stringstream ss(s);
+  std::string item;
+  std::vector<std::string> elems;
+  while (std::getline(ss, item, delim)) {
+    elems.push_back(item);
+    // elems.push_back(std::move(item)); // if C++11 (based on comment from @mchiasson)
+  }
+  return elems;
+}
 
 int main(int argc, char *argv[])
 {	
 	// open a pcap file for reading
-	pcpp::PcapFileReaderDevice reader(argv[1]);
+	pcpp::PcapNgFileReaderDevice reader(argv[1]);
 	if (!reader.open()) {
 		printf("Error opening the pcap file\n");
 		exit(1);
 	}
 	int tn = 0;
 	int fn = 0;
+
+	// Get metadata from comment field
+	std::string commentData = reader.getCaptureFileComment();
+	cout << "Comment data: " << commentData << "\n";
+
 	pcpp::RawPacket rawPacket;
 	while (reader.getNextPacket(rawPacket)) {
 		//parse the raw packet into a parsed packet
@@ -39,12 +67,15 @@ int main(int argc, char *argv[])
 	}
 	// close the file
 	reader.close();
-	cout << "True negatives: " << tn << "\n";
-	cout << "False negatives: " << fn << "\n";
+	cout << "Normal packets: " << tn << "\n";
+	cout << "DDoS packets: " << fn << "\n";
+
+	char delim = '|';
+	std::vector<std::string> testtest = split(commentData, delim);
 
 	std::ofstream outputfile;
-    outputfile.open ("results.csv", std::ios_base::app);
-    outputfile << "IddD,10,,20,,30,,40,,50\n";
+    outputfile.open("results.csv", std::ios_base::app);
+	outputfile << testtest[0] << "," << testtest[1] << "," << tn << "," << fn << "\n";
     outputfile.close();
 	return 0;
 }

@@ -24,37 +24,38 @@ int random_element(std::vector<uint32_t>& elements)
 
 int main(int argc, char *argv[])
 {
-	//get percentage argument
+	// Get overlap percentage from argument 1
 	int f = atof(argv[1]);
+
+    // Get fingerprint ID from argument 2
+    std::string fingerprint_id = argv[2];
+    
     int i = 1;
 	
+    // Generate txt output file name
 	std::string textfilename = ".txt";
-    //std::string dir = "traffic/";
 	textfilename.insert(0,argv[1]);
-    //textfilename.insert(0,dir);
 	
     //load current "file.txt" and uint32 IP addresses in a vector
     using isii = std::istream_iterator<uint32_t>;
     std::ifstream in{ textfilename};
 	std::vector<uint32_t> ints{ isii{ in }, isii{} };
-
-	//std::ifstream in("file.txt");
 	
 	int attacksize = ints.size();
-	
-	// can be used to print vector with ips:
-    //for (int i=0; i<ints.size();i++){
-    //	std::cout << ints.at(i) << ' ';
-    //}
 
-	std::string outputname = "normal.pcap";
+	std::string outputname = "normal.pcapng";
 	outputname.insert(6,argv[1]);
-	//std::cout << "Follow this command: " << outputname;
+
+    // Build the comment field, which has the fingerprint ID and overlap percentage
+    std::string commentData = fingerprint_id;
+    commentData += "|";
+    commentData += std::to_string(f);
 	
-    pcpp::PcapFileWriterDevice pcapWriter(outputname.c_str(), pcpp::LINKTYPE_ETHERNET);
+    // pcpp::PcapFileWriterDevice pcapWriter(outputname.c_str(), pcpp::LINKTYPE_ETHERNET);
+    pcpp::PcapNgFileWriterDevice pcapWriter(outputname.c_str());
 
     // try to open the file for writing
-    if (!pcapWriter.open()) {
+    if (!pcapWriter.open("", "", "", commentData.c_str())) {
         printf("Cannot open output.pcap for writing\n");
         exit(1);
     }
@@ -67,6 +68,7 @@ int main(int argc, char *argv[])
     }
     int i2 = 0;
     pcpp::RawPacket rawPacket;
+
     while (reader.getNextPacket(rawPacket)) {
         i += 1;
         i = i % 1000;
@@ -83,6 +85,8 @@ int main(int argc, char *argv[])
 			int r = random_int(0,100);
             if (f > r) {
                 ipLayer->setSrcIpAddress(pcpp::IPv4Address(ints[i2]));
+                // for testing (this changes the QoS field to only the overlap packets instead of all packets):
+                // ipLayer->getIPv4Header()->typeOfService = 255;
                 i2 += 1;
                 i2 = i2 % attacksize;
             }
@@ -90,5 +94,6 @@ int main(int argc, char *argv[])
         }
     }
     reader.close();
+    pcapWriter.close();
     return 0;
 }

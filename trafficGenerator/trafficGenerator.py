@@ -34,7 +34,7 @@ def generateTxts(fp, overlap):
 
 if __name__ == '__main__':
 	start = time.time()
-	overlap_set = [10,20,30,40,50]
+	overlap_set = [25,50,75]
 
 	# Load fingerprint from argv
 	if len(sys.argv) == 2:
@@ -51,7 +51,7 @@ if __name__ == '__main__':
 	subprocess.call(["make","-f","makefile","all"])
 	for overlap in overlap_set:
 		print("Generating PCAP for",overlap,"percent overlap")
-		subprocess.call(["./randomize", str(overlap)])
+		subprocess.call(["./randomize", str(overlap), str(filename)])
 
 	# Clean up
 	subprocess.call(["make","-f","makefile","clean"])

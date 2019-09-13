@@ -1,3 +1,5 @@
 *.pcap
+*.pcapng
 main.o
 *.txt
+*.csv
