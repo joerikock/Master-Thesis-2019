@@ -13,25 +13,14 @@
 
 using namespace std;
 
-// std::vector<std::string> split(const string& input, const string& regex)
-// {
-//     // passing -1 as the submatch index parameter performs splitting
-//     std::regex re(regex);
-//     std::sregex_token_iterator
-//         first{input.begin(), input.end(), re, -1},
-//         last;
-//     return {first, last};
-// }
-
 std::vector<std::string> split(const std::string &s, char delim) {
-  std::stringstream ss(s);
-  std::string item;
-  std::vector<std::string> elems;
-  while (std::getline(ss, item, delim)) {
-    elems.push_back(item);
-    // elems.push_back(std::move(item)); // if C++11 (based on comment from @mchiasson)
-  }
-  return elems;
+	std::stringstream ss(s);
+	std::string item;
+	std::vector<std::string> elems;
+	while (std::getline(ss, item, delim)) {
+		elems.push_back(item);
+	}
+	return elems;
 }
 
 int main(int argc, char *argv[])
@@ -47,7 +36,7 @@ int main(int argc, char *argv[])
 
 	// Get metadata from comment field
 	std::string commentData = reader.getCaptureFileComment();
-	cout << "Comment data: " << commentData << "\n";
+	// cout << "Comment data: " << commentData << "\n";
 
 	pcpp::RawPacket rawPacket;
 	while (reader.getNextPacket(rawPacket)) {
@@ -71,11 +60,11 @@ int main(int argc, char *argv[])
 	cout << "DDoS packets: " << fn << "\n";
 
 	char delim = '|';
-	std::vector<std::string> testtest = split(commentData, delim);
+	std::vector<std::string> commentSplitted = split(commentData, delim);
 
 	std::ofstream outputfile;
     outputfile.open("results.csv", std::ios_base::app);
-	outputfile << testtest[0] << "," << testtest[1] << "," << tn << "," << fn << "\n";
+	outputfile << commentSplitted[0] << "," << commentSplitted[1] << "," << tn << "," << fn << "\n";
     outputfile.close();
 	return 0;
 }
